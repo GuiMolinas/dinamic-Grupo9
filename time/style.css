@@ -1,0 +1,17 @@
+@font-face {
+    font-family: 'Alien';
+    src: url(fonts/PixelifySans-VariableFont_wght.ttf) format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+body {
+    font-family: 'Alien', 'Courier New', Courier, monospace;
+    text-align: center;
+}
+
+#board {
+    /* background-color: #020919; */
+    background-image: url("imgs/background_space.png");
+}

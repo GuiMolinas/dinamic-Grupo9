@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Alien Escape &#x1F680;</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="shortcut icon" href="../res/favicon.ico" type="image/x-icon">
+    <script>
+        // Função para lidar com o clique no botão "Jogar"
+        function startGame(event) {
+            event.preventDefault(); // Impede o envio do formulário
+    
+            var username = document.getElementById("username").value;
+            if (username.trim() !== "") {
+                // Armazenar nome de usuário no localStorage
+                localStorage.setItem('playerName', username);
+                // Redireciona para a página do jogo
+                window.location.href = "../game/index.html";
+            } else {
+                alert("Por favor, insira seu nome de usuário.");
+            }
+        }
+    
+        window.onload = function() {
+            document.getElementById("loginForm").addEventListener("submit", startGame);
+        };
+    </script>
+    
+</head>
+<body>
+    <h1>Alien Escape &#x1F680;</h1>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <label for="username">Nome de Usuário</label>
+            <input type="text" id="username" name="username" placeholder="Insira aqui seu nome" required>
+            <input type="submit" value="Jogar">
+        </form>
+    </div>
+</body>
+</html>
