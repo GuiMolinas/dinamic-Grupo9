@@ -1,9 +1,9 @@
+// Definições iniciais
 let board;
-let boardWidth = 360;
-let boardHeight = 640;
+let boardWidth = 800; // Largura para 3:4
+let boardHeight = 800; // Altura para 3:4
 let context;
 
-// Spaceship
 let shipWidth = 74;
 let shipHeight = 64;
 let shipX = boardWidth / 8;
@@ -36,9 +36,10 @@ let topObstacleImg;
 let bottomObstacleImg;
 
 // Physics
-let velocityX = -2;
+let velocityX = -4;
 let velocityY = 0;
 let gravity = 0.3;
+let thrust = -6; // Similar to flap strength
 
 // Game State
 let gameOver = false;
@@ -47,14 +48,21 @@ let obstacleInterval = 2000;
 let obstacleSpawner;
 
 // Countdown
-let timeLeft = 90;
+let timeLeft = 20;
 let timer;
+
 
 // Game over screen
 let timeUp = false;
 
 // Menu
 let menuVisible = true;
+
+// Audio
+let sfx = {
+    score: new Audio('./sfx/score.wav'),
+    die: new Audio('./sfx/die.wav')
+};
 
 window.onload = function () {
     board = document.getElementById("board");
@@ -64,30 +72,31 @@ window.onload = function () {
 
     // Load spaceship image
     shipImg = new Image();
-    shipImg.src = "./imgs/spaceship.png";
-    shipImg.onload = function () {
-        context.drawImage(shipImg, ship.x, ship.y, ship.width, ship.height);
-    };
+    shipImg.src = "../res/imgs/spaceship.png";
 
+    // Load obstacle images
     topObstacleImg = new Image();
-    topObstacleImg.src = "./imgs/cima.png";
+    topObstacleImg.src = "../res/imgs/cima.png";
     bottomObstacleImg = new Image();
-    bottomObstacleImg.src = "./imgs/baixo.png";
+    bottomObstacleImg.src = "../res/imgs/baixo.png";
 
-    requestAnimationFrame(update);
-    document.addEventListener("keydown", moveShip);
-
-    // Show the menu
-    showMenu();
+    // Ensure all images are loaded before starting the game
+    Promise.all([
+        new Promise((resolve) => shipImg.onload = resolve),
+        new Promise((resolve) => topObstacleImg.onload = resolve),
+        new Promise((resolve) => bottomObstacleImg.onload = resolve)
+    ]).then(() => {
+        requestAnimationFrame(update);
+        document.addEventListener("keydown", moveShip);
+        showMenu();
+    });
 };
 
 function update() {
     requestAnimationFrame(update);
 
     if (gameOver || timeUp) {
-        if (timeUp) {
-            showFinalScore();
-        }
+        showFinalScore();
         return;
     }
 
@@ -108,12 +117,13 @@ function update() {
     context.drawImage(shipImg, ship.x, ship.y, ship.width, ship.height);
 
     // Draw collision box
-    context.strokeStyle = "green";
-    context.lineWidth = 2;
-    context.strokeRect(shipCollisionBox.x, shipCollisionBox.y, shipCollisionBox.width, shipCollisionBox.height);
+    //context.strokeStyle = "green";
+    //context.lineWidth = 2;
+    //context.strokeRect(shipCollisionBox.x, shipCollisionBox.y, shipCollisionBox.width, shipCollisionBox.height);
 
     if (ship.y > board.height) {
         resetGame();
+        return;
     }
 
     // Obstacles
@@ -124,6 +134,7 @@ function update() {
 
         if (!obstacle.passed && ship.x > obstacle.x + obstacle.width) {
             score += 0.5;
+            sfx.score.play(); // Play score sound
             obstacle.passed = true;
         }
 
@@ -137,6 +148,7 @@ function update() {
 
         if (checkCollision(shipCollisionBox, obstacleCollisionBox)) {
             resetGame();
+            return;
         }
     }
 
@@ -147,7 +159,7 @@ function update() {
 
     // Score
     context.fillStyle = "white";
-    context.font = "35px 'Alien', sans-serif";
+    context.font = "45px 'Alien', sans-serif";
     context.strokeStyle = "lightgray";
     context.lineWidth = 4;
 
@@ -155,11 +167,12 @@ function update() {
     context.strokeText(scoreText, 10, 45);
     context.fillText(scoreText, 10, 45);
 
-    // Show the timer
+    //Timer
     let timerText = `${timeLeft}s`;
     let timerWidth = context.measureText(timerText).width;
     context.strokeText(timerText, board.width - timerWidth - 10, 45);
     context.fillText(timerText, board.width - timerWidth - 10, 45);
+
 }
 
 function updateTimer() {
@@ -176,19 +189,43 @@ function showFinalScore() {
     context.clearRect(0, 0, board.width, board.height);
     context.fillStyle = "white";
     context.font = "50px 'Alien', sans-serif";
-    let finalScoreText = `Score: ${Math.floor(score)}`;
-    let textWidth = context.measureText(finalScoreText).width;
-    context.strokeText(finalScoreText, (board.width - textWidth) / 2, board.height / 2);
-    context.fillText(finalScoreText, (board.width - textWidth) / 2, board.height / 2);
+
+    // Recuperar nome do jogador do localStorage
+    let playerName = localStorage.getItem('playerName') || 'Jogador';
+
+    let bestScore = parseFloat(localStorage.getItem('bestScore')) || 0;
+
+    // Texto final com quebra de linha
+    let nameText = `${playerName}`;
+    let scoreText = `Melhor Pontuação: ${Math.floor(bestScore)}`;
+
+    // Medir larguras do texto
+    let nameTextWidth = context.measureText(nameText).width;
+    let scoreTextWidth = context.measureText(scoreText).width;
+
+    // Definir altura das linhas e calcular a posição vertical
+    let textHeight = 50; // Ajuste conforme o tamanho da fonte
+    let totalHeight = textHeight * 2; // Altura total para duas linhas
+
+    // Calcular a posição vertical para centralizar o texto
+    let startY = (board.height / 2) - (totalHeight / 2) + textHeight;
+
+    // Desenhar o texto do nome
+    context.strokeText(nameText, (board.width - nameTextWidth) / 2, startY);
+    context.fillText(nameText, (board.width - nameTextWidth) / 2, startY);
+    
+    // Desenhar o texto da pontuação
+    context.strokeText(scoreText, (board.width - scoreTextWidth) / 2, startY + textHeight);
+    context.fillText(scoreText, (board.width - scoreTextWidth) / 2, startY + textHeight);
 }
 
 function placeObstacle() {
-    if (gameOver || timeUp) {
+    if (gameOver) {
         return;
     }
 
     let randomObstacleY = obstacleY - obstacleHeight / 5 - Math.random() * (obstacleHeight / 2);
-    let openingSpace = (board.height / 4) + 10;
+    let openingSpace = (board.height / 6) + 10;
 
     let topObstacle = {
         img: topObstacleImg,
@@ -213,7 +250,7 @@ function placeObstacle() {
 
 function moveShip(e) {
     if (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyX") {
-        velocityY = -6;
+        velocityY = thrust; // Apply thrust
 
         // Start the game if the menu is visible
         if (menuVisible) {
@@ -234,16 +271,30 @@ function checkCollision(rect1, rect2) {
     );
 }
 
+function checkBestScore() {
+    //Pega ponto e o armazena
+    let bestScore = localStorage.getItem('bestScore');
+
+    //Verifica se há pontuação ou se foi maior
+    if (bestScore === null || score > parseFloat(bestScore)) {
+        // Atualizar a melhor pontuação no localStorage
+        localStorage.setItem('bestScore', Math.floor(score));
+    }
+}
+
 function resetGame() {
+    checkBestScore();
+    
     ship.y = shipY;
     obstacleArray = [];
-    velocityX = -2;
+    velocityX = -4;
     velocityY = 0;
     obstacleInterval = 2000;
     clearInterval(obstacleSpawner);
-    obstacleSpawner = setInterval(placeObstacle, obstacleInterval);
-    score = 0;
     gameOver = false;
+    obstacleSpawner = setInterval(placeObstacle, obstacleInterval);
+    sfx.die.play(); // Play die sound
+    score = 0;
 }
 
 function showMenu() {

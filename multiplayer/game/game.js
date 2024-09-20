@@ -1,6 +1,6 @@
 // Definições iniciais
-let boardWidth = 900; // Largura para 3:4
-let boardHeight = 900; // Altura para 3:4
+let boardWidth = 800; // Largura para 3:4
+let boardHeight = 800; // Altura para 3:4
 
 let shipWidth = 74;
 let shipHeight = 64;
@@ -34,9 +34,10 @@ let topObstacleImg;
 let bottomObstacleImg;
 
 // Physics
-let velocityX = -2;
+let velocityX = -4;
 let velocityY = 0;
 let gravity = 0.3;
+let thrust = -6; // Similar to flap strength
 
 // Game State
 let gameOver = false;
@@ -46,6 +47,12 @@ let obstacleSpawner;
 
 // Menu
 let menuVisible = true;
+
+// Audio
+let sfx = {
+    score: new Audio('./sfx/score.wav'),
+    die: new Audio('./sfx/die.wav')
+};
 
 window.onload = function () {
     board = document.getElementById("board");
@@ -99,9 +106,9 @@ function update() {
     context.drawImage(shipImg, ship.x, ship.y, ship.width, ship.height);
 
     // Draw collision box
-    context.strokeStyle = "green";
-    context.lineWidth = 2;
-    context.strokeRect(shipCollisionBox.x, shipCollisionBox.y, shipCollisionBox.width, shipCollisionBox.height);
+    //context.strokeStyle = "green";
+    //context.lineWidth = 2;
+    //context.strokeRect(shipCollisionBox.x, shipCollisionBox.y, shipCollisionBox.width, shipCollisionBox.height);
 
     if (ship.y > board.height) {
         resetGame();
@@ -116,6 +123,7 @@ function update() {
 
         if (!obstacle.passed && ship.x > obstacle.x + obstacle.width) {
             score += 0.5;
+            sfx.score.play(); // Play score sound
             obstacle.passed = true;
         }
 
@@ -187,7 +195,7 @@ function placeObstacle() {
     }
 
     let randomObstacleY = obstacleY - obstacleHeight / 5 - Math.random() * (obstacleHeight / 2);
-    let openingSpace = (board.height / 4) + 10;
+    let openingSpace = (board.height / 6) + 10;
 
     let topObstacle = {
         img: topObstacleImg,
@@ -212,7 +220,7 @@ function placeObstacle() {
 
 function moveShip(e) {
     if (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyX") {
-        velocityY = -6;
+        velocityY = thrust; // Apply thrust
 
         // Start the game if the menu is visible
         if (menuVisible) {
@@ -235,10 +243,10 @@ function checkCollision(rect1, rect2) {
 function resetGame() {
     clearInterval(obstacleSpawner);
     gameOver = true;
+    sfx.die.play(); // Play die sound
     showFinalScore();
     localStorage.removeItem('playerName'); // Remove o nome do jogador
 }
-
 
 function showMenu() {
     menuVisible = true;

@@ -1,0 +1,31 @@
+@font-face {
+    font-family: 'Alien';
+    src: url(../res/fonts/PixelifySans-VariableFont_wght.ttf) format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-image: url("../res/imgs/back.jpg");
+    font-family: 'Alien', 'Courier New', Courier, monospace;
+    text-align: center;
+}
+
+canvas {
+    border: 2px solid #fff;
+    /* Ajuste o tamanho do canvas para a proporção correta */
+    width: 900px; /* Largura para 3:4 */
+    height: 100vh; /* Altura para 3:4 */
+}
+
+#board {
+    /* background-color: #020919; */
+    background-image: url("../res/background_space.png");
+}
