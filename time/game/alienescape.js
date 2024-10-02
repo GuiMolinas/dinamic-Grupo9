@@ -271,6 +271,7 @@ function checkBestScore() {
 
     if (score > bestScore) {
         localStorage.setItem('bestScore', Math.floor(score)); // Armazena a nova melhor pontuação
+        console.log("Nova melhor pontuação:", score); // Adiciona um log para verificar
     }
 }
 
