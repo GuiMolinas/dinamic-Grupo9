@@ -66,11 +66,9 @@ let sfx = {
 
 // Inicialização do jogo
 window.onload = function () {
-    //localStorage.removeItem('bestScore'); // Remove o valor armazenado da melhor pontuação
     score = 0; // Zera a pontuação ao recarregar a página
     let playerName = prompt("Digite seu nome:") || 'Jogador'; // Define o nome como 'Jogador' se a entrada estiver vazia
     localStorage.setItem('playerName', playerName); // Armazena o nome no localStorage
-
 
     board = document.getElementById("board");
     board.height = boardHeight;
@@ -141,9 +139,6 @@ function update() {
             score += 0.5; // A pontuação aumenta em 0.5 ao passar por cada obstáculo
             sfx.score.play(); // Toca o som de pontuação
             obstacle.passed = true; // Marca o obstáculo como "passado"
-
-            // Verifica e atualiza a melhor pontuação a cada mudança no score
-            checkBestScore(); 
         }
 
         // Caixa de colisão do obstáculo
@@ -194,17 +189,16 @@ function updateTimer() {
     }
 }
 
-// Exibe a pontuação final e o melhor score
+// Exibe a pontuação final
 function showFinalScore() {
     context.clearRect(0, 0, board.width, board.height);
     context.fillStyle = "white";
     context.font = "50px 'Alien', sans-serif";
 
     let playerName = localStorage.getItem('playerName') || 'Jogador';
-    let bestScore = parseFloat(localStorage.getItem('bestScore')) || 0;
 
     let nameText = `${playerName}`;
-    let scoreText = `Melhor Pontuação: ${Math.floor(bestScore)}`;
+    let scoreText = `Pontuação Final: ${Math.floor(score)}`; // Exibe a pontuação final
 
     let nameTextWidth = context.measureText(nameText).width;
     let scoreTextWidth = context.measureText(scoreText).width;
@@ -251,69 +245,43 @@ function placeObstacle() {
     obstacleArray.push(bottomObstacle);
 }
 
-// Função que move a nave
-function moveShip(e) {
-    if (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyX") {
-        velocityY = thrust; // Aplica o impulso de pulo
-
-        if (menuVisible) {
-            menuVisible = false; // Inicia o jogo se o menu estiver visível
-            obstacleSpawner = setInterval(placeObstacle, obstacleInterval);
-            timer = setInterval(updateTimer, 1000); // Começa o timer quando o jogo começa
-        }
-    }
-}
-
-// Função que verifica colisões
-function checkCollision(rect1, rect2) {
-    return (
-        rect1.x < rect2.x + rect2.width &&
-        rect1.x + rect1.width > rect2.x &&
-        rect1.y < rect2.y + rect2.height &&
-        rect1.y + rect1.height > rect2.y
-    );
-}
-
-// Verifica e atualiza a melhor pontuação
-function checkBestScore() {
-    let bestScore = parseFloat(localStorage.getItem('bestScore')) || 0; // Melhor pontuação ou 0
-    let roundedScore = Math.floor(score); // Arredonda a pontuação atual
-
-    if (roundedScore > bestScore) {
-        localStorage.setItem('bestScore', roundedScore); // Armazena a nova melhor pontuação
-        console.log("Nova melhor pontuação:", roundedScore); // Adiciona um log para depurar
-    }
-}
-
 // Reinicia o jogo
 function resetGame() {
-    checkBestScore(); // Verifica e atualiza a melhor pontuação
-
-    ship.y = shipY;
-    obstacleArray = [];
-    velocityX = -4;
-    velocityY = 0;
-    obstacleInterval = 2000;
+    // Limpa o intervalo de obstáculos
     clearInterval(obstacleSpawner);
-    gameOver = false;
-    obstacleSpawner = setInterval(placeObstacle, obstacleInterval);
-    sfx.die.play(); // Toca o som de morte
+    obstacleArray = [];
     score = 0;
+    ship.y = shipY; // Reseta a posição da nave
+    gameOver = true; // Define o estado do jogo como "game over"
 }
 
-// Exibe o menu inicial
+// Mostra o menu inicial
 function showMenu() {
-    menuVisible = true;
-    context.clearRect(0, 0, board.width, board.height);
+    context.fillStyle = "rgba(0, 0, 0, 0.7)";
+    context.fillRect(0, 0, board.width, board.height);
     context.fillStyle = "white";
+    context.font = "50px 'Alien', sans-serif";
+    context.fillText("Pressione ENTER para começar", board.width / 2 - 300, board.height / 2);
+}
 
-    context.font = "30px 'Alien', sans-serif";
-    if (!context.font.match(/Alien/i)) {
-        context.font = "30px Arial, sans-serif"; // Fonte alternativa se 'Alien' não estiver disponível
+// Move a nave
+function moveShip(event) {
+    if (gameOver) return; // Não permite mover a nave se o jogo acabou
+    if (event.key === "ArrowUp" || event.key === " ") { // Usa espaço ou seta para cima
+        velocityY = thrust; // Aplica a força de impulso
     }
 
-    let menuText = "START";
-    let textWidth = context.measureText(menuText).width;
-    context.strokeText(menuText, (board.width - textWidth) / 2, board.height / 2);
-    context.fillText(menuText, (board.width - textWidth) / 2, board.height / 2);
+    if (event.key === "Enter" && menuVisible) {
+        menuVisible = false; // Fecha o menu
+        obstacleSpawner = setInterval(placeObstacle, obstacleInterval); // Começa a gerar obstáculos
+        timer = setInterval(updateTimer, 1000); // Começa o timer
+    }
+}
+
+// Checa colisão
+function checkCollision(boxA, boxB) {
+    return boxA.x < boxB.x + boxB.width &&
+           boxA.x + boxA.width > boxB.x &&
+           boxA.y < boxB.y + boxB.height &&
+           boxA.height + boxA.y > boxB.y;
 }
