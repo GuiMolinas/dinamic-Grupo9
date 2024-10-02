@@ -48,7 +48,7 @@ let obstacleInterval = 2000;
 let obstacleSpawner;
 
 // Countdown
-let timeLeft = 90;
+let timeLeft = 60;
 let timer;
 
 
