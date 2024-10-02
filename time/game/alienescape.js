@@ -66,6 +66,11 @@ let sfx = {
 
 // Inicialização do jogo
 window.onload = function () {
+    score = 0; // Zera a pontuação ao recarregar a página
+    let playerName = prompt("Digite seu nome:") || 'Jogador'; // Define o nome como 'Jogador' se a entrada estiver vazia
+    localStorage.setItem('playerName', playerName); // Armazena o nome no localStorage
+
+
     board = document.getElementById("board");
     board.height = boardHeight;
     board.width = boardWidth;
