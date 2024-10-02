@@ -66,7 +66,7 @@ let sfx = {
 
 // Inicialização do jogo
 window.onload = function () {
-    localStorage.removeItem('bestScore'); // Remove o valor armazenado da melhor pontuação
+    //localStorage.removeItem('bestScore'); // Remove o valor armazenado da melhor pontuação
     score = 0; // Zera a pontuação ao recarregar a página
     let playerName = prompt("Digite seu nome:") || 'Jogador'; // Define o nome como 'Jogador' se a entrada estiver vazia
     localStorage.setItem('playerName', playerName); // Armazena o nome no localStorage
@@ -141,6 +141,9 @@ function update() {
             score += 0.5; // A pontuação aumenta em 0.5 ao passar por cada obstáculo
             sfx.score.play(); // Toca o som de pontuação
             obstacle.passed = true; // Marca o obstáculo como "passado"
+
+            // Verifica e atualiza a melhor pontuação a cada mudança no score
+            checkBestScore(); 
         }
 
         // Caixa de colisão do obstáculo
@@ -169,7 +172,7 @@ function update() {
     context.strokeStyle = "lightgray";
     context.lineWidth = 4;
 
-    let scoreText = score.toString();
+    let scoreText = Math.floor(score).toString();
     context.strokeText(scoreText, 10, 45);
     context.fillText(scoreText, 10, 45);
 
@@ -274,10 +277,11 @@ function checkCollision(rect1, rect2) {
 // Verifica e atualiza a melhor pontuação
 function checkBestScore() {
     let bestScore = parseFloat(localStorage.getItem('bestScore')) || 0; // Melhor pontuação ou 0
+    let roundedScore = Math.floor(score); // Arredonda a pontuação atual
 
-    if (score > bestScore) {
-        localStorage.setItem('bestScore', Math.floor(score)); // Armazena a nova melhor pontuação
-        console.log("Nova melhor pontuação:", score); // Adiciona um log para verificar
+    if (roundedScore > bestScore) {
+        localStorage.setItem('bestScore', roundedScore); // Armazena a nova melhor pontuação
+        console.log("Nova melhor pontuação:", roundedScore); // Adiciona um log para depurar
     }
 }
 
