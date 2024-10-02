@@ -267,10 +267,10 @@ function checkCollision(rect1, rect2) {
 
 // Verifica e atualiza a melhor pontuação
 function checkBestScore() {
-    let bestScore = localStorage.getItem('bestScore');
+    let bestScore = parseFloat(localStorage.getItem('bestScore')) || 0; // Melhor pontuação ou 0
 
-    if (bestScore === null || score > parseFloat(bestScore)) {
-        localStorage.setItem('bestScore', Math.floor(score));
+    if (score > bestScore) {
+        localStorage.setItem('bestScore', Math.floor(score)); // Armazena a nova melhor pontuação
     }
 }
 
