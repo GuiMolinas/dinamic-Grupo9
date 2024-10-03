@@ -45,6 +45,7 @@ let thrust = -6; // Força aplicada ao "pular"
 // Estado do jogo
 let gameOver = false;
 let score = 0; // Pontuação do jogador
+let bestScore = 0; //Melhor pontuação
 let obstacleInterval = 2000; // Intervalo entre a geração de obstáculos
 let obstacleSpawner; // Intervalo de spawn dos obstáculos
 
@@ -201,7 +202,6 @@ function showFinalScore() {
     context.font = "50px 'Alien', sans-serif";
 
     let playerName = localStorage.getItem('playerName') || 'Jogador';
-    let bestScore = parseFloat(localStorage.getItem('bestScore')) || 0;
 
     let nameText = `${playerName}`;
     let scoreText = `Melhor Pontuação: ${Math.floor(bestScore)}`;
@@ -276,11 +276,10 @@ function checkCollision(rect1, rect2) {
 
 // Verifica e atualiza a melhor pontuação
 function checkBestScore() {
-    let bestScore = parseFloat(localStorage.getItem('bestScore')) || 0; // Melhor pontuação ou 0
     let roundedScore = Math.floor(score); // Arredonda a pontuação atual
 
     if (roundedScore > bestScore) {
-        localStorage.setItem('bestScore', roundedScore); // Armazena a nova melhor pontuação
+        bestScore = roundedScore // Armazena a nova melhor pontuação
         console.log("Nova melhor pontuação:", roundedScore); // Adiciona um log para depurar
     }
 }
