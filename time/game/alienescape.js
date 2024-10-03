@@ -219,6 +219,37 @@ function showFinalScore() {
 
     context.strokeText(scoreText, (board.width - scoreTextWidth) / 2, startY + textHeight);
     context.fillText(scoreText, (board.width - scoreTextWidth) / 2, startY + textHeight);
+
+    // Escuta o evento de pressionar a barra de espaço para reiniciar o jogo
+    document.addEventListener("keydown", handleRestart, { once: true });
+}
+
+// Função que lida com a reinicialização
+function handleRestart(e) {
+    if (e.code === "Space") {
+        // Pede o nome do jogador novamente
+        let playerName = prompt("Digite seu nome:") || 'Jogador'; 
+        localStorage.setItem('playerName', playerName); // Armazena o nome no localStorage
+
+        // Reinicia as variáveis do jogo
+        resetGameState();
+        showMenu(); // Volta para a tela de início
+    }
+}
+
+// Função que reinicia o estado do jogo sem reiniciar tudo
+function resetGameState() {
+    score = 0;
+    bestScore = 0; // Reseta o score
+    timeLeft = 60; // Reseta o tempo
+    ship.y = shipY;
+    obstacleArray = [];
+    velocityX = -4;
+    velocityY = 0;
+    clearInterval(obstacleSpawner);
+    clearInterval(timer);
+    gameOver = false;
+    timeUp = false;
 }
 
 // Função que posiciona obstáculos
