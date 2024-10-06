@@ -170,17 +170,13 @@ function update() {
     // Exibe a pontuação na tela
     context.fillStyle = "white";
     context.font = "45px 'Alien', sans-serif";
-    context.strokeStyle = "lightgray";
-    context.lineWidth = 4;
 
     let scoreText = Math.floor(score).toString();
-    context.strokeText(scoreText, 10, 45);
     context.fillText(scoreText, 10, 45);
 
     // Exibe o tempo restante na tela
     let timerText = `${timeLeft}s`;
     let timerWidth = context.measureText(timerText).width;
-    context.strokeText(timerText, board.width - timerWidth - 10, 45);
     context.fillText(timerText, board.width - timerWidth - 10, 45);
 }
 
@@ -214,10 +210,8 @@ function showFinalScore() {
 
     let startY = (board.height / 2) - (totalHeight / 2) + textHeight;
 
-    context.strokeText(nameText, (board.width - nameTextWidth) / 2, startY);
     context.fillText(nameText, (board.width - nameTextWidth) / 2, startY);
 
-    context.strokeText(scoreText, (board.width - scoreTextWidth) / 2, startY + textHeight);
     context.fillText(scoreText, (board.width - scoreTextWidth) / 2, startY + textHeight);
 
     // Escuta o evento de pressionar a barra de espaço para reiniciar o jogo
@@ -344,6 +338,5 @@ function showMenu() {
 
     let menuText = "START";
     let textWidth = context.measureText(menuText).width;
-    context.strokeText(menuText, (board.width - textWidth) / 2, board.height / 2);
     context.fillText(menuText, (board.width - textWidth) / 2, board.height / 2);
 }
